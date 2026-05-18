@@ -67,15 +67,15 @@ pub const Headers = struct {
         // libcurl leaves the list intact when curl_slist_append fails, so we own it.
         errdefer libcurl.curl_slist_free_all(header_list);
 
-        // Always add sec-CH-UA header
-        const with_sec_ch_ua = libcurl.curl_slist_append(header_list, Config.HttpHeaders.sec_ch_ua);
-        if (with_sec_ch_ua == null) {
-            return error.OutOfMemory;
-        }
+        // Lightpanda upstream: Sec-Ch-Ua hardcoded a "Lightpanda";v="1". Comentado para fork personal.
+        // const with_sec_ch_ua = libcurl.curl_slist_append(header_list, Config.HttpHeaders.sec_ch_ua);
+        // if (with_sec_ch_ua == null) {
+        //     return error.OutOfMemory;
+        // }
 
         // Always add Accept-Language. Omitting it triggers bot-protection on
         // some CDNs (Akamai) when Accept-Encoding is present.
-        const updated_headers = libcurl.curl_slist_append(with_sec_ch_ua, Config.HttpHeaders.accept_language);
+        const updated_headers = libcurl.curl_slist_append(header_list, Config.HttpHeaders.accept_language);
         if (updated_headers == null) {
             return error.OutOfMemory;
         }

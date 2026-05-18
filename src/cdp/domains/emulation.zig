@@ -91,10 +91,11 @@ pub fn setUserAgentOverride(cmd: *CDP.Command) !void {
     const ua = params.userAgent;
     Config.validateUserAgent(ua) catch |err| switch (err) {
         error.NonPrintable => return cmd.sendError(-32602, "User agent contains non-printable characters", .{}),
-        error.Reserved => {
-            log.warn(.not_implemented, "Emulation.setUserAgentOverride", .{ .param = "userAgent", .value = ua, .info = "User agent must not contain Mozilla" });
-            return cmd.sendResult(null, .{});
-        },
+        // Lightpanda upstream: rama error.Reserved (rechazo de "Mozilla"). Comentada porque Config.validateUserAgent ya no la emite.
+        // error.Reserved => {
+        //     log.warn(.not_implemented, "Emulation.setUserAgentOverride", .{ .param = "userAgent", .value = ua, .info = "User agent must not contain Mozilla" });
+        //     return cmd.sendResult(null, .{});
+        // },
     };
 
     const bc = cmd.browser_context orelse return error.BrowserContextNotLoaded;

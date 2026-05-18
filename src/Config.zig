@@ -596,7 +596,8 @@ pub fn validateUserAgent(ua: []const u8) !void {
         }
     }
 
-    if (std.ascii.indexOfIgnoreCase(ua, "mozilla") != null) {
-        return error.Reserved;
-    }
+    // Lightpanda upstream: rechaza UAs con "Mozilla". Comentado para fork personal.
+    // if (std.ascii.indexOfIgnoreCase(ua, "mozilla") != null) {
+    //     return error.Reserved;
+    // }
 }
