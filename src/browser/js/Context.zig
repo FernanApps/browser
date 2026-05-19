@@ -580,10 +580,16 @@ pub fn dynamicModuleCallback(
             break :blk self.global.base();
         }
 
-        break :blk js.String.toSliceZ(.{ .local = &local, .handle = resource_name.? }) catch |err| {
+        const candidate = js.String.toSliceZ(.{ .local = &local, .handle = resource_name.? }) catch |err| {
             log.err(.app, "OOM", .{ .err = err, .src = "dynamicModuleCallback1" });
             return @constCast(local.rejectPromise(.{ .generic_error = "Out of memory" }).handle);
         };
+        // V8 a veces pasa un module identifier opaco (no URL) como resource_name.
+        // Sin este check URL.resolve(base, specifier) produce paths fantasma tipo /e/_ o /52bo/_.
+        if (!std.mem.startsWith(u8, candidate, "http://") and !std.mem.startsWith(u8, candidate, "https://")) {
+            break :blk self.global.base();
+        }
+        break :blk candidate;
     };
 
     const specifier = js.String.toSliceZ(.{ .local = &local, .handle = v8_specifier.? }) catch |err| {
